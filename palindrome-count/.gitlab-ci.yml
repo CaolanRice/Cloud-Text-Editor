@@ -1,0 +1,12 @@
+image: python:3-alpine
+
+before_script:
+  - python3 -V
+  - pip3 install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+
+test:app:
+  script:
+    - pip3 install flask flask_cors flask_restful
+    - python -m unittest test_palindromecount.py
