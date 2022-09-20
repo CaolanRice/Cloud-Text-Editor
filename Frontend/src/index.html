@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QUBeditotron3000</title>
+    <script type="text/javascript" src="config.js"></script>
+    <script type="text/javascript">
+
+        let proxyURL = PROXY_URL;
+
+
+
+        //this function calls the proxy server to query for our services, has 2 working backup proxy urls
+        function editorService(service) {
+            let xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    parseResponse(this.response, service)
+                } else if (this.status != 200) {
+                    proxyURL = BACKUP_TWO_URL;
+                    xhttp.open("GET", proxyURL + "/?service=" + service + "&text=" + encodeURI(document.getElementById('content').value));
+                    if (this.status != 200) {
+                        proxyURL = BACKUP_URL;
+                        xhttp.open("GET", proxyURL + "/?service=" + service + "&text=" + encodeURI(document.getElementById('content').value));
+                    }
+                }
+            }
+
+
+            xhttp.open("GET", proxyURL + "/?service=" + service + "&text=" + encodeURI(document.getElementById('content').value));
+            xhttp.send();
+        }
+
+
+
+        function parseResponse(response, service) {
+            var j = JSON.parse(response);
+            console.log(j)
+            if (service == 'WORD_COUNT' || service == 'CHAR_COUNT') {
+                document.getElementById('output').value = j.answer;
+            }
+            else {
+                document.getElementById('output').value = j.result;
+            }
+
+        }
+
+
+    </script>
+
+    <style type="text/css">
+        body {
+            font-size: 150%;
+            font-family: monospace;
+        }
+
+        #logo {
+            font-family: Calibri, sans-serif;
+            font-weight: lighter;
+            color: #505050;
+            margin: 0.5em;
+        }
+
+        #editor {
+            text-align: center;
+            margin-top: 1em;
+        }
+
+        #output {
+            font-size: 100%;
+            padding: 0.2em;
+            margin: 0.2em;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+        }
+
+        #content {
+            font-size: 100%;
+            padding: 0.2em;
+            margin: 0.2em;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+        }
+
+        .operation {
+            border: solid #d0d0d0 1px;
+            background-color: #f0f0f0;
+            padding: 1.5em;
+            margin: 1em;
+            width: 14em;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="editor">
+        <div id="logo">
+            QUBeditotron3000
+        </div>
+        <div>
+            <textarea rows="5" cols="40" id="content">It was the best of cloud, it was the worst of cloud...</textarea>
+        </div>
+        <div>
+            <input type="text" id="output" readonly="1" value="" />
+        </div>
+        <div>
+            <button class="operation" onclick="editorService('WORD_COUNT');">Word Count</button>
+            <button class="operation" onclick="editorService('CHAR_COUNT');">Character Count</button>
+        </div>
+        <div>
+            <button class="operation" onclick="editorService('AND_COUNT');">And Count</button>
+            <button class="operation" onclick="editorService('VOWEL_COUNT');">Vowel Count</button>
+        </div>
+        <div>
+            <button class="operation" onclick="editorService('COMMA_COUNT');">Comma Count</button>
+            <button class="operation" onclick="editorService('PALINDROME_COUNT');">Palindrome Count</button>
+        </div>
+    </div>
+</body>
+
+
+</html>
